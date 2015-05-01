@@ -1,11 +1,5 @@
 <?php
 class wfDB {
-	private $dbh = false;
-	private static $dbhCache = array();
-	private $dbhost = false;
-	private $dbpassword = false;
-	private $dbname = false;
-	private $dbuser = false;
 	public $errorMsg = false;
 	public function __construct(){
 	}
@@ -104,6 +98,11 @@ class wfDB {
 		global $wpdb;
 		return $wpdb->last_error;
 	}
+	public function realEscape($str){
+		global $wpdb;
+		return $wpdb->_real_escape($str);
+	}
+
 }
 
 ?>

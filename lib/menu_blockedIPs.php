@@ -1,6 +1,7 @@
 <div class="wordfenceModeElem" id="wordfenceMode_blockedIPs"></div>
 <div class="wrap">
-	<?php $pageTitle = "Wordfence Blocked IPs"; include('pageTitle.php'); ?>
+	<?php require('menuHeader.php'); ?>
+	<?php $helpLink="http://docs.wordfence.com/en/Blocked_IPs"; $helpLabel="Learn more about Blocked IPs"; $pageTitle = "Wordfence Blocked IPs"; include('pageTitle.php'); ?>
 	<div class="wordfenceLive">
 		<table border="0" cellpadding="0" cellspacing="0">
 		<tr><td><h2>Wordfence Live Activity:</h2></td><td id="wfLiveStatus"></td></tr>
@@ -35,7 +36,7 @@
 <tr><td style="vertical-align: top;">
 	<div>
 		{{if loc}}
-			<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+			<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 			<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 		{{else}}
 			An unknown location at IP <a href="${WFAD.makeIPTrafLink(IP)}" target="_blank">${IP}</a>
@@ -69,7 +70,7 @@
 <tr><td>
 	<div>
 		{{if loc}}
-			<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+			<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 			<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 		{{else}}
 			An unknown location at IP <a href="${WFAD.makeIPTrafLink(IP)}" target="_blank">${IP}</a>
@@ -112,7 +113,7 @@
 <tr><td>
 	<div>
 		{{if loc}}
-			<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+			<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 			<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 		{{else}}
 			An unknown location at IP <a href="${WFAD.makeIPTrafLink(IP)}" target="_blank">${IP}</a>

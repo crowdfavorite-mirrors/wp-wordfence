@@ -1,6 +1,23 @@
 <div class="wordfenceModeElem" id="wordfenceMode_activity"></div>
 <div class="wrap wordfence">
-	<?php $pageTitle = "Live Site Activity"; include('pageTitle.php'); ?>
+	<?php require('menuHeader.php'); ?>
+
+	<h2 id="wfHeading">
+		<div style="float: left;">
+			Your Site Activity in Real-Time	
+		</div>
+		<div class="wordfenceWrap" style="margin: 5px 0 0 15px; float: left;">
+			<div class="wfOnOffSwitch" id="wfOnOffSwitchID">
+				<input type="checkbox" name="wfOnOffSwitch" class="wfOnOffSwitch-checkbox" id="wfLiveTrafficOnOff" <?php if(wfConfig::liveTrafficEnabled()){ echo ' checked '; } ?>>
+				<label class="wfOnOffSwitch-label" for="wfLiveTrafficOnOff">
+					<div class="wfOnOffSwitch-inner"></div>
+					<div class="wfOnOffSwitch-switch"></div>
+				</label>
+			</div>
+		</div>
+	</h2>
+	<br clear="both" />
+	<a href="http://docs.wordfence.com/en/Live_traffic" target="_blank" class="wfhelp"></a><a href="http://docs.wordfence.com/en/Live_traffic" target="_blank">Learn more about Wordfence Live Traffic</a>
 	<div class="wordfenceLive">
 		<table border="0" cellpadding="0" cellspacing="0">
 		<tr><td><h2>Wordfence Live Activity:</h2></td><td id="wfLiveStatus"></td></tr>
@@ -8,16 +25,26 @@
 	</div>
 	<div class="wordfenceWrap">
 		<div>
+			<?php if(! wfConfig::liveTrafficEnabled()){ ?>
+			<div style="color: #F00;">
+				Live Traffic is disabled.
+				<?php if(wfConfig::get('cacheType') == 'falcon'){ ?>This is done to improve performance because you have Wordfence Falcon Engine enabled.<?php } ?>
+			</div>
+			<?php } ?>
 			<div id="wfTabs">
+				<?php if(wfConfig::liveTrafficEnabled()){ ?>
 				<a href="#" class="wfTab1 wfTabSwitch selected" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_hit', function(){ WFAD.activityTabChanged(); }); return false;">All Hits</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_human', function(){ WFAD.activityTabChanged(); }); return false;">Humans</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_ruser', function(){ WFAD.activityTabChanged(); }); return false;">Registered Users</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_crawler', function(){ WFAD.activityTabChanged(); }); return false;">Crawlers</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_gCrawler', function(){ WFAD.activityTabChanged(); }); return false;">Google Crawlers</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_404', function(){ WFAD.activityTabChanged(); }); return false;">Pages Not Found</a>
-				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_loginLogout', function(){ WFAD.activityTabChanged(); }); return false;">Logins and Logouts</a>
+				<?php } ?>
+				<a href="#" id="wfLoginLogoutTab" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_loginLogout', function(){ WFAD.activityTabChanged(); }); return false;">Logins and Logouts</a>
+				<?php if(wfConfig::liveTrafficEnabled()){ ?>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_topLeechers', function(){ WFAD.staticTabChanged(); }); return false;">Top Consumers</a>
 				<a href="#" class="wfTab1 wfTabSwitch" onclick="wordfenceAdmin.switchTab(this, 'wfTab1', 'wfDataPanel', 'wfActivity_topScanners', function(){ WFAD.staticTabChanged(); }); return false;">Top 404s</a>
+				<?php } ?>
 			</div>
 			<div class="wfTabsContainer">
 				<div id="wfActivity_hit" class="wfDataPanel"><div class="wfLoadingWhite32"></div></div>
@@ -43,7 +70,7 @@
 <tr><td>
 	<div>
 		{{if loc}}
-			<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+			<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 			<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 		{{else}}
 			An unknown location at IP <a href="${WFAD.makeIPTrafLink(IP)}" target="_blank">${IP}</a>
@@ -78,7 +105,7 @@
 <div class="wfActEvent" id="wfActEvent_${id}">
 	<div>
 		{{if loc}}
-			<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+			<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 			<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 		{{else}}
 			An unknown location at IP ${IP}
@@ -122,7 +149,7 @@
 	{{/if}}
 	{{if loc}}
 		{{if user}}in {{/if}}
-		<img src="http://www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
+		<img src="//www.wordfence.com/images/flags/${loc.countryCode.toLowerCase()}.png" width="16" height="11" alt="${loc.countryName}" title="${loc.countryName}" class="wfFlag" />
 		<a href="http://maps.google.com/maps?q=${loc.lat},${loc.lon}&z=6" target="_blank">{{if loc.city}}${loc.city}, {{/if}}${loc.countryName}</a>
 	{{else}}
 		An unknown location at IP <a href="${WFAD.makeIPTrafLink(IP)}" target="_blank">${IP}</a>
@@ -134,16 +161,10 @@
 			left <a href="${referer}" target="_blank" style="color: #999; font-weight: normal;">${referer}</a> and
 		{{/if}}
 	{{/if}}
-	{{if activityMode == 'hit'}}
-		landed on 
-	{{else activityMode == 'human' || activityMode == 'ruser'}}
+	{{if is404 == '1'}}
+		tried to access <span style="color: #F00;">non-existent page</span>
+	{{else}}
 		visited
-	{{else activityMode == '404'}}
-		tried to access
-	{{else activityMode == 'gCrawler'}}
-		crawled
-	{{else activityMode == 'crawler'}}
-		crawled
 	{{/if}}
 <a href="${URL}" target="_blank">${URL}</a>
 </td></tr>

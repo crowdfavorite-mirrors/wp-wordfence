@@ -32,7 +32,12 @@ class wfIssues {
 		$ignoreC = md5($ignoreC);
 		$rec = $this->getDB()->querySingleRec("select status, ignoreP, ignoreC from " . $this->issuesTable . " where (ignoreP='%s' OR ignoreC='%s')", $ignoreP, $ignoreC);
 		if($rec){
-			if($rec['status'] == 'new' && ($rec['ignoreC'] == $ignoreC || $rec['ignoreP'] == $ignoreP)){ return false; }
+			if($rec['status'] == 'new' && ($rec['ignoreC'] == $ignoreC || $rec['ignoreP'] == $ignoreP)){ 
+				if($type != 'file'){ //Filter out duplicate new issues but not infected files because we want to see all infections even if file contents are identical
+					return false; 
+				}
+			}
+
 			if($rec['status'] == 'ignoreC' && $rec['ignoreC'] == $ignoreC){ return false; }
 			if($rec['status'] == 'ignoreP' && $rec['ignoreP'] == $ignoreP){ return false; }
 		}
@@ -77,7 +82,8 @@ class wfIssues {
 	public function emailNewIssues(){
 		$level = wfConfig::getAlertLevel();
 		$emails = wfConfig::getAlertEmails();
-		$subject = "[Wordfence Alert] Problems found on " . get_bloginfo('name', 'raw');
+		$shortSiteURL = preg_replace('/^https?:\/\//i', '', site_url());
+		$subject = "[Wordfence Alert] Problems found on $shortSiteURL";
 
 		if(sizeof($emails) < 1){ return; }
 		if($level < 1){ return; }
@@ -116,18 +122,45 @@ class wfIssues {
 		if($level == 2 && $totalCriticalIssues < 1 && $totalWarningIssues < 1){ return; }
 		if($level == 1 && $totalCriticalIssues < 1){ return; }
 		$content = wfUtils::tmpl('email_newIssues.php', array(
+			'isPaid' => wfConfig::get('isPaid'),
 			'issues' => $finalIssues,
 			'totalCriticalIssues' => $totalCriticalIssues,
 			'totalWarningIssues' => $totalWarningIssues,
 			'level' => $level
 			));
-		wp_mail(implode(',', $emails), $subject, $content);
+		
+		require_once ABSPATH . WPINC . '/class-phpmailer.php';
+		require_once ABSPATH . WPINC . '/class-smtp.php';
+		$mail = new PHPMailer;
+		
+		// Get the site domain and get rid of www.
+		$from_email = 'wordpress@' . preg_replace('/^(https?:\/\/(www.)?)(.+?)(\/)?$/', '$3', site_url());
+		
+		$mail->From = apply_filters( 'wp_mail_from', $from_email );
+		$mail->FromName = apply_filters( 'wp_mail_from_name', 'Wordfence' );
+		
+		foreach ($emails as $email) {
+			try {
+				$mail->addAddress($email);
+			} catch (phpmailerException $e) {
+				
+			}
+		}
+		
+		$mail->Subject = $subject;
+		$mail->msgHTML($content);
+		
+		try {
+			$mail->send();
+		} catch (phpmailerException $e) {
+			// use wp_mail if there's a problem (which uses PHPMailer anyways :P)
+			wp_mail(implode(',', $emails), $subject, strip_tags($content));
+		}
 	}
 	public function deleteIssue($id){ 
 		$this->getDB()->queryWrite("delete from " . $this->issuesTable . " where id=%d", $id);
 	}
 	public function updateIssue($id, $status){ //ignoreC, ignoreP, delete or new
-		$currentStatus = $this->getDB()->querySingle("select status from " . $this->issuesTable . " where id=%d", $id);
 		if($status == 'delete'){
 			$this->getDB()->queryWrite("delete from " . $this->issuesTable . " where id=%d", $id);
 		} else if($status == 'ignoreC' || $status == 'ignoreP' || $status == 'new'){
@@ -140,7 +173,6 @@ class wfIssues {
 		return $rec;
 	}
 	public function getIssues(){ 
-		$issues = wfConfig::get('wf_issues', array());
 		$ret = array(
 			'new' => array(),
 			'ignored' => array()
@@ -226,7 +258,7 @@ class wfIssues {
 		$res1 = $wpdb->get_col("show tables"); $dat['totalTables'] = sizeof($res1);
 		$totalRows = 0;
 		foreach($res1 as $table){
-			$res2 = $wpdb->get_col("select count(*) from $table");
+			$res2 = $wpdb->get_col("select count(*) from `$table`");
 			if(isset($res2[0]) ){
 				$totalRows += $res2[0];
 			}
